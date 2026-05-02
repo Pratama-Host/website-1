@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+             script-src 'self' 'unsafe-inline';
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+             font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+             img-src 'self' data: blob: *;
+             media-src 'self' data: blob: *;
+             connect-src 'self';"
+    />
+    <title>Admin — TKJ XI-9 (Simulasi)</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <!-- Animated network background -->
+    <canvas id="network-canvas"></canvas>
+
+    <main class="page container" id="main-content">
+      <div class="sec-head">
+        <div class="sec-tag">Admin (Simulasi)</div>
+        <h1 class="sec-title">Login Admin Palsu</h1>
+        <p class="sec-desc">
+          Masukkan user dan password untuk melihat dashboard monitoring
+          (client-side only).
+        </p>
+      </div>
+
+      <div class="card" style="max-width: 480px">
+        <form
+          id="admin-login"
+          style="display: flex; flex-direction: column; gap: 8px"
+        >
+          <input
+            id="admin-user"
+            class="input"
+            placeholder="username"
+            required
+          />
+          <input
+            id="admin-pass"
+            class="input"
+            placeholder="password"
+            type="password"
+            required
+          />
+          <div style="display: flex; gap: 8px">
+            <button class="btn btn-primary">Login</button>
+            <button id="admin-guest" type="button" class="btn">
+              Masuk sebagai tamu
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div id="admin-dashboard" style="margin-top: 18px; display: none">
+        <div class="card" style="padding: 18px">
+          <h3>Dashboard Monitoring</h3>
+          <div
+            id="admin-stats"
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+              gap: 12px;
+              margin-top: 12px;
+            "
+          ></div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../settings.js"></script>
+    <script src="../index.js"></script>
+  </body>
+</html>

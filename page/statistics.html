@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+             script-src 'self' 'unsafe-inline';
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+             font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+             img-src 'self' data: blob: *;
+             media-src 'self' data: blob: *;
+             connect-src 'self';"
+    />
+
+    <title>TKJ XI-9 - Statistik Interaktif | SMK Muhammadiyah Belitang</title>
+    <meta
+      name="description"
+      content="Statistik interaktif kelas TKJ XI-9. Lihat metrik acak, grafik aktivitas, dan performa kelas secara visual."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="./statistics.html" />
+
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="TKJ XI-9 - Statistik Interaktif | SMK Muhammadiyah Belitang"
+    />
+    <meta
+      property="og:description"
+      content="Statistik interaktif kelas TKJ XI-9. Lihat metrik acak, grafik aktivitas, dan performa kelas secara visual."
+    />
+    <meta
+      property="og:image"
+      content="https://picsum.photos/seed/tkj-stats/1200/630"
+    />
+    <meta property="og:url" content="./statistics.html" />
+
+    <link rel="manifest" href="../others/manifest.json" />
+    <meta name="theme-color" content="#0f0a0a" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+      />
+    </noscript>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../animations.css" />
+  </head>
+  <body>
+    <canvas id="network-canvas"></canvas>
+    <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+    <div id="page-progress" aria-hidden="true"></div>
+
+    <header class="top-bar" role="banner">
+      <div class="top-bar-brand">
+        <a href="../index.html" aria-label="TKJ XI-9 — Beranda">
+          <div class="brand-badge" aria-hidden="true">TKJ</div>
+          <div>
+            <div class="brand-name">TKJ XI-9</div>
+            <div class="brand-year mono">2025/2026</div>
+          </div>
+        </a>
+      </div>
+      <div class="top-bar-actions"></div>
+    </header>
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html"
+        ><i class="fas fa-house" aria-hidden="true"></i> Beranda</a
+      >
+      <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      <span class="bc-current" aria-current="page">Statistik</span>
+    </nav>
+
+    <main class="page container" id="main-content">
+      <div class="sec-head">
+        <div class="sec-tag">Grafik Kelas</div>
+        <h1 class="sec-title">Statistik Interaktif</h1>
+        <p class="sec-desc">
+          Data acak sementara untuk menilai tampilan statistik interaktif. Tekan
+          tombol untuk mereset nilai dan lihat perubahan grafik.
+        </p>
+      </div>
+
+      <div
+        class="page-panel grid gap-20"
+        style="grid-template-columns: 1fr 320px; align-items: start"
+      >
+        <section class="card card-glow">
+          <div class="card-head">
+            <div>
+              <div class="card-tag">Status Real-time</div>
+              <h2 class="card-title">Metrik Kinerja Kelas</h2>
+            </div>
+            <button
+              id="refresh-stats"
+              class="btn btn-primary btn-sm"
+              type="button"
+            >
+              <i class="fas fa-sync-alt" aria-hidden="true"></i>
+              Acak Data
+            </button>
+          </div>
+
+          <div
+            class="stats-grid grid gap-16"
+            style="grid-template-columns: repeat(2, minmax(0, 1fr))"
+          >
+            <article class="stat-card">
+              <div class="stat-meta">
+                <span class="stat-label">Keterlibatan Harian</span>
+                <span class="stat-value" id="metric-1">0%</span>
+              </div>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" id="bar-1"></div>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-meta">
+                <span class="stat-label">Proyek Selesai</span>
+                <span class="stat-value" id="metric-2">0%</span>
+              </div>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" id="bar-2"></div>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-meta">
+                <span class="stat-label">Rata-rata Nilai</span>
+                <span class="stat-value" id="metric-3">0</span>
+              </div>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" id="bar-3"></div>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-meta">
+                <span class="stat-label">Aktivitas Bulan Ini</span>
+                <span class="stat-value" id="metric-4">0%</span>
+              </div>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar" id="bar-4"></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="chart-panel" style="margin-top: 24px">
+            <div class="chart-header">
+              <div>
+                <div class="card-tag">Visualisasi</div>
+                <h3 class="card-title">Distribusi Metrik</h3>
+              </div>
+            </div>
+            <div
+              class="chart-legend grid gap-12"
+              style="
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                margin-top: 18px;
+              "
+            >
+              <span class="legend-pill"
+                ><i class="fas fa-circle"></i> Keterlibatan</span
+              >
+              <span class="legend-pill"
+                ><i class="fas fa-circle"></i> Proyek</span
+              >
+              <span class="legend-pill"
+                ><i class="fas fa-circle"></i> Nilai</span
+              >
+            </div>
+            <div
+              class="chart-dashboard grid gap-18"
+              style="grid-template-columns: 1fr 1fr; margin-top: 24px"
+            >
+              <div class="donut-card card">
+                <div>
+                  <div class="card-tag">Komposisi</div>
+                  <h4 class="card-title">Rasio Kinerja</h4>
+                </div>
+                <div class="donut-chart" id="donut-chart">
+                  <span class="donut-label"
+                    ><strong>0%</strong><small>Rata-rata</small></span
+                  >
+                </div>
+              </div>
+              <div class="trend-card card">
+                <div>
+                  <div class="card-tag">Tren Mingguan</div>
+                  <h4 class="card-title">Aktivitas Sekarang</h4>
+                </div>
+                <div class="trend-chart" id="trend-chart"></div>
+                <div class="trend-caption">
+                  Perubahan angka dibuat acak untuk menunjukkan variasi mingguan
+                  dan dinamika kelas.
+                </div>
+              </div>
+            </div>
+            <div class="chart-bar-wrap" id="chart-bar-wrap"></div>
+          </div>
+        </section>
+
+        <aside class="card card-glow">
+          <div class="card-head">
+            <div>
+              <div class="card-tag">Keterangan</div>
+              <h2 class="card-title">Bantuan Cepat</h2>
+            </div>
+          </div>
+          <div class="card-body">
+            <p>
+              Hallaman ini menampilkan metrik acak sebagai contoh visualisasi
+              statistik. Klik tombol <strong>Acak Data</strong> untuk
+              memperbarui semua nilai.
+            </p>
+            <ul class="list-disc">
+              <li>Keterlibatan: persentase kehadiran dan partisipasi.</li>
+              <li>Proyek Selesai: capaian tim dalam pengerjaan proyek.</li>
+              <li>Rata-rata Nilai: nilai rata-rata kelas dalam evaluasi.</li>
+              <li>
+                Aktivitas Bulan Ini: aktivitas pembelajaran dan praktik kelas.
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="footer-strip container" role="contentinfo">
+      <div class="footer-top">
+        <div class="footer-copy">
+          © <span class="footer-year hl"></span> TKJ XI-9 · SMK Muhammadiyah
+          Belitang
+        </div>
+        <div class="footer-links">
+          <a href="../index.html">Beranda</a>
+          <a href="about.html">Tentang</a>
+        </div>
+      </div>
+      <div class="footer-social" aria-label="Sosial media kami"></div>
+    </footer>
+
+    <button id="back-to-top" aria-label="Kembali ke atas">
+      <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </button>
+
+    <script>
+      function randomValue(min, max) {
+        return Math.round(Math.random() * (max - min) + min);
+      }
+
+      function setMetric(id, value, suffix = "") {
+        const label = document.getElementById(id);
+        if (label) label.textContent = value + suffix;
+      }
+
+      function refreshStats() {
+        const values = [
+          {
+            id: "metric-1",
+            value: randomValue(70, 100),
+            suffix: "%",
+            bar: "bar-1",
+          },
+          {
+            id: "metric-2",
+            value: randomValue(58, 100),
+            suffix: "%",
+            bar: "bar-2",
+          },
+          {
+            id: "metric-3",
+            value: randomValue(78, 98),
+            suffix: "",
+            bar: "bar-3",
+          },
+          {
+            id: "metric-4",
+            value: randomValue(62, 95),
+            suffix: "%",
+            bar: "bar-4",
+          },
+        ];
+
+        values.forEach((item, index) => {
+          setMetric(item.id, item.value, item.suffix);
+          const bar = document.getElementById(item.bar);
+          if (bar) bar.style.width = Math.min(item.value, 100) + "%";
+        });
+
+        const chart = document.getElementById("chart-bar-wrap");
+        if (!chart) return;
+        chart.innerHTML = values
+          .map(
+            (item, idx) =>
+              `<div class="chart-bar-item" style="--w:${Math.min(item.value, 100)}%"><span>${item.value}${item.suffix}</span></div>`,
+          )
+          .join("");
+
+        renderDonutChart(values);
+        renderTrendChart();
+      }
+
+      function renderDonutChart(values) {
+        const donut = document.getElementById("donut-chart");
+        if (!donut) return;
+
+        const total = values.reduce((sum, item) => sum + item.value, 0);
+        const average = Math.round(total / values.length);
+        const colors = [
+          "var(--accent)",
+          "var(--accent-2)",
+          "rgba(var(--accent-rgb), 0.75)",
+          "rgba(var(--accent-rgb), 0.45)",
+        ];
+
+        let start = 0;
+        const segments = values
+          .map((item, index) => {
+            const slice = Math.max(1, Math.round((item.value / total) * 100));
+            const end =
+              index === values.length - 1 ? 100 : Math.min(100, start + slice);
+            const segment = `${colors[index]} ${start}% ${end}%`;
+            start = end;
+            return segment;
+          })
+          .join(", ");
+
+        donut.style.background = `conic-gradient(${segments})`;
+        donut.innerHTML = `
+          <span class="donut-label">
+            <strong>${average}%</strong>
+            <small>Rata-rata kelas</small>
+          </span>
+        `;
+      }
+
+      function renderTrendChart() {
+        const trend = document.getElementById("trend-chart");
+        if (!trend) return;
+
+        const days = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+        const points = days.map(() => randomValue(42, 98));
+
+        trend.innerHTML = points
+          .map(
+            (value, index) =>
+              `<div class="trend-bar-item"><div class="trend-bar" style="height:${value}%" data-value="${value}"></div><span>${days[index]}</span></div>`,
+          )
+          .join("");
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const refresh = document.getElementById("refresh-stats");
+        if (refresh) {
+          refresh.addEventListener("click", refreshStats);
+        }
+        refreshStats();
+      });
+    </script>
+  </body>
+</html>

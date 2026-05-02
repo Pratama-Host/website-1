@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+             script-src 'self' 'unsafe-inline';
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+             font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+             img-src 'self' data: blob: *;
+             media-src 'self' data: blob: *;
+             connect-src 'self';"
+    />
+
+    <title>TKJ XI-9 - Tentang Kami | SMK Muhammadiyah Belitang</title>
+    <meta
+      name="description"
+      content="TKJ XI-9 - Tentang Kami | Kelas Teknik Komputer Jaringan. Kenali visi, misi, motto, dan profil wali kelas TKJ XI-9 SMK Muhammadiyah Belitang."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="./about.html" />
+
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="TKJ XI-9 - Tentang Kami | SMK Muhammadiyah Belitang"
+    />
+    <meta
+      property="og:description"
+      content="Kenali visi, misi, motto, dan profil kelas TKJ XI-9 SMK Muhammadiyah Belitang."
+    />
+    <meta
+      property="og:image"
+      content="https://picsum.photos/seed/tkj-xi9-og/1200/630"
+    />
+    <meta property="og:url" content="./about.html" />
+
+    <link rel="manifest" href="../others/manifest.json" />
+    <meta name="theme-color" content="#0f0a0a" />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23b91c1c'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='white'>TKJ</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+    /></noscript>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../animations.css" />
+  </head>
+  <body>
+    <!-- Animated network background -->
+    <canvas id="network-canvas"></canvas>
+
+    <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+    <div id="page-progress" aria-hidden="true"></div>
+
+    <header class="top-bar" role="banner">
+      <div class="top-bar-brand">
+        <a href="../index.html" aria-label="TKJ XI-9 — Beranda">
+          <div class="brand-badge" aria-hidden="true">TKJ</div>
+          <div>
+            <div class="brand-name">TKJ XI-9</div>
+            <div class="brand-year mono">2025/2026</div>
+          </div>
+        </a>
+      </div>
+      <div class="top-bar-actions">
+        <!-- Theme toggle & hamburger will be placed here by JS -->
+      </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html"
+        ><i class="fas fa-house" aria-hidden="true"></i> Beranda</a
+      >
+      <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      <span class="bc-current" aria-current="page">Tentang</span>
+    </nav>
+
+    <main class="page container" id="main-content">
+      <div class="sec-head">
+        <div class="sec-tag">Profil Kelas</div>
+        <h1 class="sec-title">Tentang XI-9</h1>
+        <p class="sec-desc" id="kelas-desc"></p>
+      </div>
+
+      <!-- Wali Kelas -->
+      <div
+        class="wali-card reveal"
+        id="wali-card"
+        style="--d: 0s"
+        aria-label="Profil Wali Kelas"
+      >
+        <div class="avatar lg avatar-ring" aria-hidden="true"></div>
+        <div class="wali-info">
+          <h3 class="wali-name">—</h3>
+          <p class="wali-pos mono">Wali Kelas XI-9 TKJ</p>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <!-- Visi -->
+        <div class="card about-card card-accent-top reveal" style="--d: 0.08s">
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-eye"></i>
+          </div>
+          <h3>Visi</h3>
+          <p id="visi-text"></p>
+        </div>
+
+        <!-- Motto -->
+        <div class="card about-card card-accent-top reveal" style="--d: 0.16s">
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-quote-left"></i>
+          </div>
+          <h3>Motto</h3>
+          <blockquote class="motto-box" id="motto-text"></blockquote>
+        </div>
+
+        <!-- Misi -->
+        <div
+          class="card about-card card-accent-top full reveal"
+          style="--d: 0.24s"
+        >
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <h3>Misi</h3>
+          <ul
+            class="misi-list"
+            id="misi-list"
+            aria-label="Daftar misi kelas"
+          ></ul>
+        </div>
+
+        <!-- Prestasi (FIX: sebelumnya data G.prestasi tidak pernah dirender) -->
+        <div
+          class="card about-card card-accent-top full reveal"
+          style="--d: 0.32s"
+        >
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <h3>Prestasi Kelas</h3>
+          <div
+            class="prestasi-list"
+            id="prestasi-list"
+            aria-label="Daftar prestasi kelas TKJ XI-9"
+          ></div>
+        </div>
+
+        <!-- Buku Tamu (Guestbook) -->
+        <div
+          class="card about-card card-accent-top full reveal"
+          style="--d: 0.4s"
+        >
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-book"></i>
+          </div>
+          <h3>Buku Tamu</h3>
+          <form
+            id="guestbook-form"
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              margin-top: 8px;
+            "
+          >
+            <input
+              id="guest-name"
+              class="input"
+              placeholder="Nama"
+              required
+              aria-label="Nama"
+            />
+            <textarea
+              id="guest-msg"
+              class="input"
+              placeholder="Pesan untuk kelas..."
+              rows="3"
+              required
+              aria-label="Pesan"
+            ></textarea>
+            <div style="display: flex; gap: 8px">
+              <button type="submit" class="btn btn-primary">Kirim</button>
+              <button type="button" id="guest-clear" class="btn">
+                Bersihkan
+              </button>
+            </div>
+          </form>
+          <div
+            id="guestbook-list"
+            style="
+              margin-top: 12px;
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            "
+          ></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-strip container" role="contentinfo">
+      <div class="footer-top">
+        <div class="footer-copy">
+          © <span class="footer-year hl"></span> TKJ XI-9 · SMK Muhammadiyah
+          Belitang
+        </div>
+        <div class="footer-links">
+          <a href="../index.html">Beranda</a>
+          <a href="structure.html">Struktur</a>
+        </div>
+      </div>
+      <div class="footer-social" aria-label="Sosial media kami"></div>
+    </footer>
+
+    <button id="back-to-top" aria-label="Kembali ke atas">
+      <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../settings.js"></script>
+    <script src="../index.js"></script>
+  </body>
+</html>

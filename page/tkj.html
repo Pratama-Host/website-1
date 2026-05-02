@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+             script-src 'self' 'unsafe-inline';
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+             font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+             img-src 'self' data: blob: *;
+             media-src 'self' data: blob: *;
+             connect-src 'self';"
+    />
+
+    <title>TKJ XI-9 - Apa Itu TKJ? | SMK Muhammadiyah Belitang</title>
+    <meta
+      name="description"
+      content="TKJ XI-9 - Info Jurusan TKJ | Teknik Komputer dan Jaringan SMK Muhammadiyah Belitang. Pelajari mata pelajaran, alur kurikulum, dan prospek karir lulusan TKJ."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="./tkj.html" />
+
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="TKJ XI-9 - Apa Itu TKJ? | SMK Muhammadiyah Belitang"
+    />
+    <meta
+      property="og:description"
+      content="Pelajari seluk-beluk jurusan Teknik Komputer dan Jaringan (TKJ) SMK Muhammadiyah Belitang."
+    />
+    <meta
+      property="og:image"
+      content="https://picsum.photos/seed/tkj-xi9-og/1200/630"
+    />
+    <meta property="og:url" content="./tkj.html" />
+
+    <link rel="manifest" href="../others/manifest.json" />
+    <meta name="theme-color" content="#0f0a0a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23b91c1c'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='700' font-size='13' fill='white'>TKJ</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap"
+    /></noscript>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../animations.css" />
+  </head>
+  <body>
+    <!-- Animated network background -->
+    <canvas id="network-canvas"></canvas>
+
+    <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+    <div id="page-progress" aria-hidden="true"></div>
+
+    <header class="top-bar" role="banner">
+      <div class="top-bar-brand">
+        <a href="../index.html" aria-label="TKJ XI-9 — Beranda">
+          <div class="brand-badge" aria-hidden="true">TKJ</div>
+          <div>
+            <div class="brand-name">TKJ XI-9</div>
+            <div class="brand-year mono">2025/2026</div>
+          </div>
+        </a>
+      </div>
+      <div class="top-bar-actions">
+        <!-- Theme toggle & hamburger will be placed here by JS -->
+      </div>
+    </header>
+
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html"
+        ><i class="fas fa-house" aria-hidden="true"></i> Beranda</a
+      >
+      <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      <span class="bc-current" aria-current="page">TKJ</span>
+    </nav>
+
+    <main class="page container" id="main-content">
+      <!-- Hero TKJ -->
+      <div class="tkj-hero reveal" style="--d: 0s">
+        <div class="sec-tag" style="margin-bottom: 12px">Jurusan</div>
+        <h1>Apa Itu TKJ?</h1>
+        <p id="tkj-desc"></p>
+      </div>
+
+      <div class="tkj-grid">
+        <!-- Mata Pelajaran -->
+        <div class="card tkj-card card-accent-top reveal" style="--d: 0.08s">
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-book-open"></i>
+          </div>
+          <h3>Mata Pelajaran</h3>
+          <div
+            class="mapel-list"
+            id="tkj-mapel"
+            aria-label="Daftar mata pelajaran TKJ"
+          ></div>
+        </div>
+
+        <!-- Kurikulum -->
+        <div class="card tkj-card card-accent-top reveal" style="--d: 0.16s">
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3>Alur Kurikulum</h3>
+          <div
+            class="kurikulum-list"
+            id="tkj-kurikulum"
+            aria-label="Alur kurikulum TKJ per kelas"
+          ></div>
+        </div>
+
+        <!-- Prospek Karir -->
+        <div
+          class="card tkj-card card-accent-top reveal"
+          style="grid-column: 1/-1; --d: 0.24s"
+        >
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-briefcase"></i>
+          </div>
+          <h3>Prospek Karir</h3>
+          <div
+            class="karir-list"
+            id="tkj-karir"
+            aria-label="Daftar prospek karir lulusan TKJ"
+          ></div>
+        </div>
+
+        <!-- TKJ Tools: Subnet Calculator -->
+        <div class="card tkj-card card-accent-top reveal" style="--d: 0.32s">
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-network-wired"></i>
+          </div>
+          <h3>Subnet Calculator</h3>
+          <p class="text-sm">Masukkan IP/CIDR (contoh: 192.168.1.1/24)</p>
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <input
+              id="subnet-input"
+              class="input"
+              placeholder="192.168.1.1/24"
+              aria-label="Input IP dan CIDR"
+            />
+            <button id="subnet-calc-btn" class="btn">Hitung</button>
+          </div>
+          <div
+            id="subnet-result"
+            style="
+              margin-top: 12px;
+              font-family: &quot;Fira Code&quot;, monospace;
+              font-size: 0.9rem;
+              color: var(--text-2);
+            "
+          ></div>
+        </div>
+
+        <!-- TKJ Tools: Ping Simulator -->
+        <div class="card tkj-card card-accent-top reveal" style="--d: 0.4s">
+          <div class="icon-box" aria-hidden="true">
+            <i class="fas fa-broadcast-tower"></i>
+          </div>
+          <h3>Ping Simulator</h3>
+          <p class="text-sm">Simulasi ping visual ke server kelas</p>
+          <div
+            style="
+              display: flex;
+              gap: 8px;
+              margin-top: 8px;
+              align-items: center;
+            "
+          >
+            <input
+              id="ping-host"
+              class="input"
+              placeholder="tkj-xi9.smkn1"
+              aria-label="Host untuk diping"
+            />
+            <button id="ping-btn" class="btn">Ping</button>
+          </div>
+          <div
+            id="ping-log"
+            style="
+              margin-top: 12px;
+              font-family: &quot;Fira Code&quot;, monospace;
+              font-size: 0.9rem;
+              color: var(--text-2);
+            "
+          ></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-strip container" role="contentinfo">
+      <div class="footer-top">
+        <div class="footer-copy">
+          © <span class="footer-year hl"></span> TKJ XI-9 · SMK Muhammadiyah
+          Belitang
+        </div>
+        <div class="footer-links">
+          <a href="../index.html">Beranda</a>
+          <a href="skills.html">Skills</a>
+        </div>
+      </div>
+      <div class="footer-social" aria-label="Sosial media kami"></div>
+    </footer>
+
+    <button id="back-to-top" aria-label="Kembali ke atas">
+      <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="../settings.js"></script>
+    <script src="../index.js"></script>
+  </body>
+</html>
