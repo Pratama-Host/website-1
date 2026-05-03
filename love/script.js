@@ -1,367 +1,360 @@
 "use strict";
 
 (function () {
-  /* ─── KONFIGURASI ────────────────────────────────────────────────── */
+
   const CONFIG = Object.freeze({
-    kodeRahasia:   "KODEKUSTOMU",   // ganti sesuai kode yang diinginkan
-    triggerClicks: 5,
-    triggerWindow: 2000,            // ms — jendela waktu multi-klik
-    typewriterDelay: 50,            // ms per karakter
-    pesanTypewriter: "Hai, kamu... 🌸\nAku mau ngasih tau sesuatu\nyang udah lama aku simpan.",
-    pesanKedua:     "Makasih udah ada. ✨\nSemoga harimu selalu\nseindah kamu. 💕",
-    jumlahHati: 18,
-    emojiHati:  ["🩷", "💜", "🤍", "🌸", "✨", "💗", "🫧", "🌷"],
-    fotoFallback: "https://picsum.photos/400/500?blur=2",
-    transisiDurasi: 800,            // ms — durasi fade in/out
+    kodeRahasia:    "KODEKUSTOMU",
+    triggerClicks:  5,
+    triggerWindow:  2000,
+    typewriterMs:   52,
+    pesanTypewriter:"Hai, kamu... 🌸\nAku mau ngasih tau sesuatu\nyang udah lama aku simpan.",
+    pesanKedua:     "Makasih udah ada. ✨\nSemoga harimu selalu\nseindah senyummu. 💕",
+    fotoFallback:   "https://picsum.photos/400/500?blur=2",
+    transisiMs:     900,
+    jumlahBintang:  55,
   });
 
-  /* ─── STATE ──────────────────────────────────────────────────────── */
-  let clickCount   = 0;
-  let lastClick    = 0;
-  let isPlaying    = false;
+  let clickCount = 0;
+  let lastClick  = 0;
+  let isPlaying  = false;
+  let entryBg    = null;
+  let mainBg     = null;
 
-  /* ─── INIT ───────────────────────────────────────────────────────── */
-  document.addEventListener("DOMContentLoaded", init);
-
-  function init() {
-    const el = getElements();
+  /* ── BOOT ─────────────────────────────────────────────── */
+  document.addEventListener("DOMContentLoaded", function () {
+    const el = queryAll();
     if (!el) return;
 
     setupFotoFallback(el.foto);
     setupAudio(el.audio, el.btnMusik);
     setupTrigger(el.trigger, el.modal, el.input);
-    setupModal(el.modal, el.input, el.errorMsg, el.closeBtn, el.form);
-    setupFormSubmit(el.form, el.input, el.errorMsg, el.modal, el.pintu, el.utama, el.pesanType, el.pesanDua, el.btnMusik, el.audio);
+    setupModal(el.modal, el.input, el.errorMsg, el.closeBtn);
+    setupFormSubmit(el);
     setupMusikBtn(el.btnMusik, el.audio);
-  }
 
-  /* ─── ELEMEN ─────────────────────────────────────────────────────── */
-  function getElements() {
-    const ids = [
-      "trigger", "modal-kode", "kode-input", "error-msg",
-      "modal-close", "kode-form", "pintu-masuk", "halaman-utama",
-      "pesan-typewriter", "pesan-dua", "btn-musik", "audio-bg", "foto-utama",
-    ];
+    entryBg = createSubtleCanvas("bg-canvas", "entry");
+  });
 
-    const elements = {};
-    for (const id of ids) {
-      const el = document.getElementById(id);
-      if (!el) {
-        console.warn("[EasterEgg] Elemen tidak ditemukan:", id);
-        return null;
-      }
-      elements[id] = el;
-    }
-
-    return {
-      trigger:    elements["trigger"],
-      modal:      elements["modal-kode"],
-      input:      elements["kode-input"],
-      errorMsg:   elements["error-msg"],
-      closeBtn:   elements["modal-close"],
-      form:       elements["kode-form"],
-      pintu:      elements["pintu-masuk"],
-      utama:      elements["halaman-utama"],
-      pesanType:  elements["pesan-typewriter"],
-      pesanDua:   elements["pesan-dua"],
-      btnMusik:   elements["btn-musik"],
-      audio:      elements["audio-bg"],
-      foto:       elements["foto-utama"],
+  /* ── QUERY ────────────────────────────────────────────── */
+  function queryAll() {
+    const ids = {
+      trigger:"trigger", modal:"modal-kode", input:"kode-input",
+      errorMsg:"error-msg", closeBtn:"modal-close", pintu:"pintu-masuk",
+      utama:"halaman-utama", pesanType:"pesan-typewriter",
+      pesanDua:"pesan-dua", btnMusik:"btn-musik", audio:"audio-bg", foto:"foto-utama",
     };
+    const out = {};
+    for (const [k, id] of Object.entries(ids)) {
+      const node = document.getElementById(id);
+      if (!node) { console.warn("[EE] Missing:", id); return null; }
+      out[k] = node;
+    }
+    out.kartu = document.querySelector(".kartu");
+    return out;
   }
 
-  /* ─── FOTO FALLBACK ──────────────────────────────────────────────── */
+  /* ── FOTO FALLBACK ────────────────────────────────────── */
   function setupFotoFallback(foto) {
-    foto.addEventListener("error", function onFotoError() {
-      foto.removeEventListener("error", onFotoError);
+    foto.addEventListener("error", function h() {
+      foto.removeEventListener("error", h);
       foto.src = CONFIG.fotoFallback;
     });
   }
 
-  /* ─── AUDIO ──────────────────────────────────────────────────────── */
-  function setupAudio(audio, btnMusik) {
-    if (!audio || typeof audio.play !== "function") return;
-
-    audio.addEventListener("error", function () {
-      btnMusik.classList.add("hidden");
-    });
+  /* ── AUDIO ────────────────────────────────────────────── */
+  function setupAudio(audio, btn) {
+    if (!audio) return;
+    audio.addEventListener("error", function () { btn.classList.add("hidden"); });
   }
 
-  /* ─── TRIGGER (klik tersembunyi) ─────────────────────────────────── */
+  /* ── TRIGGER ──────────────────────────────────────────── */
   function setupTrigger(trigger, modal, input) {
-    function handleActivate() {
-      const now   = Date.now();
-      const delta = now - lastClick;
-      lastClick   = now;
-
-      clickCount = (delta > CONFIG.triggerWindow) ? 1 : clickCount + 1;
-
-      if (clickCount >= CONFIG.triggerClicks) {
-        clickCount = 0;
-        openModal(modal, input);
-      }
+    function activate() {
+      const now = Date.now();
+      clickCount = (now - lastClick > CONFIG.triggerWindow) ? 1 : clickCount + 1;
+      lastClick  = now;
+      if (clickCount >= CONFIG.triggerClicks) { clickCount = 0; openModal(modal, input); }
     }
-
-    trigger.addEventListener("click", handleActivate);
+    trigger.addEventListener("click", activate);
     trigger.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleActivate();
-      }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); }
     });
   }
 
-  /* ─── MODAL ──────────────────────────────────────────────────────── */
-  function setupModal(modal, input, errorMsg, closeBtn, _form) {
-    // Tutup dengan tombol close
-    closeBtn.addEventListener("click", function () {
-      closeModal(modal, input, errorMsg);
-    });
-
-    // Tutup klik di luar panel
+  /* ── MODAL ────────────────────────────────────────────── */
+  function setupModal(modal, input, errorMsg, closeBtn) {
+    closeBtn.addEventListener("click", function () { closeModal(modal, input, errorMsg); });
     modal.addEventListener("click", function (e) {
       if (e.target === modal) closeModal(modal, input, errorMsg);
     });
-
-    // Tutup dengan Escape
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+      if (e.key === "Escape" && !modal.classList.contains("hidden"))
         closeModal(modal, input, errorMsg);
-      }
     });
-
-    // Focus trap di dalam modal
     modal.addEventListener("keydown", function (e) {
       if (e.key !== "Tab") return;
-
-      const focusable = Array.from(
-        modal.querySelectorAll(
-          'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-      );
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last  = focusable[focusable.length - 1];
-
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
+      const f = Array.from(modal.querySelectorAll(
+        "button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex='-1'])"
+      ));
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0])
+        { e.preventDefault(); f[f.length-1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length-1])
+        { e.preventDefault(); f[0].focus(); }
     });
   }
 
-  /* ─── FORM SUBMIT ────────────────────────────────────────────────── */
-  function setupFormSubmit(form, input, errorMsg, modal, pintu, utama, pesanType, pesanDua, btnMusik, audio) {
-    const submitBtn = document.getElementById("kode-submit");
-
-    function handleSubmit() {
-      const value  = input.value.trim().toUpperCase();
-      const secret = CONFIG.kodeRahasia.toUpperCase();
-
-      if (value === secret) {
-        closeModal(modal, input, errorMsg);
-        bukaHalamanUtama(pintu, utama, pesanType, pesanDua, btnMusik, audio);
-        return;
-      }
-
-      tampilkanError(errorMsg, input, "Kode salah, coba lagi 🥺");
-    }
-
-    submitBtn.addEventListener("click", handleSubmit);
-
-    // Submit saat tekan Enter di input
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleSubmit();
-      }
-    });
-  }
-
-  /* ─── MUSIK ──────────────────────────────────────────────────────── */
-  function setupMusikBtn(btnMusik, audio) {
-    if (!btnMusik || !audio) return;
-
-    btnMusik.addEventListener("click", function () {
-      if (audio.paused) {
-        audio.play()
-          .then(function () {
-            isPlaying = true;
-            updateMusikBtn(btnMusik, true);
-          })
-          .catch(function () {
-            isPlaying = false;
-            updateMusikBtn(btnMusik, false);
-          });
-      } else {
-        audio.pause();
-        isPlaying = false;
-        updateMusikBtn(btnMusik, false);
-      }
-    });
-  }
-
-  /* ─── HELPER: UPDATE TOMBOL MUSIK ───────────────────────────────── */
-  function updateMusikBtn(btn, playing) {
-    btn.textContent    = playing ? "🎵 Pause Musik" : "🎵 Play Musik";
-    btn.dataset.state  = playing ? "playing" : "paused";
-    btn.setAttribute("aria-label", playing ? "Pause musik" : "Play musik");
-    btn.classList.toggle("paused", !playing);
-  }
-
-  /* ─── HELPER: TAMPILKAN ERROR ────────────────────────────────────── */
-  function tampilkanError(errorMsg, input, teks) {
-    errorMsg.textContent = teks;
-    errorMsg.classList.remove("hidden");
-
-    input.classList.add("shake");
-    input.addEventListener(
-      "animationend",
-      function () { input.classList.remove("shake"); },
-      { once: true }
-    );
-
-    input.value = "";
-    input.focus();
-  }
-
-  /* ─── BUKA / TUTUP MODAL ─────────────────────────────────────────── */
   function openModal(modal, input) {
     modal.classList.remove("hidden");
     modal.removeAttribute("aria-hidden");
-
-    // Reset state
-    const errorMsg = document.getElementById("error-msg");
-    if (errorMsg) {
-      errorMsg.classList.add("hidden");
-      errorMsg.textContent = "";
-    }
+    const err = document.getElementById("error-msg");
+    if (err) { err.classList.add("hidden"); err.textContent = ""; }
     input.value = "";
-
-    // Fokus ke input setelah transisi
     requestAnimationFrame(function () { input.focus(); });
   }
 
   function closeModal(modal, input, errorMsg) {
     modal.classList.add("hidden");
-    modal.setAttribute("aria-hidden", "true");
-
-    input.value        = "";
-    errorMsg.textContent = "";
-    errorMsg.classList.add("hidden");
+    modal.setAttribute("aria-hidden","true");
+    input.value = "";
+    if (errorMsg) { errorMsg.textContent = ""; errorMsg.classList.add("hidden"); }
   }
 
-  /* ─── BUKA HALAMAN UTAMA ─────────────────────────────────────────── */
-  function bukaHalamanUtama(pintu, utama, pesanType, pesanDua, btnMusik, audio) {
-    // Coba putar audio
-    if (audio && typeof audio.play === "function") {
-      audio.play()
-        .then(function () {
-          isPlaying = true;
-          btnMusik.classList.remove("hidden");
-          updateMusikBtn(btnMusik, true);
-        })
-        .catch(function () {
-          // Autoplay diblokir browser → tampilkan tombol manual
-          btnMusik.classList.remove("hidden");
-          updateMusikBtn(btnMusik, false);
-        });
+  /* ── FORM SUBMIT ──────────────────────────────────────── */
+  function setupFormSubmit(el) {
+    const { modal, input, errorMsg, pintu, utama, pesanType, pesanDua, btnMusik, audio, kartu } = el;
+    const submitBtn = document.getElementById("kode-submit");
+
+    function handle() {
+      if (input.value.trim().toUpperCase() === CONFIG.kodeRahasia.toUpperCase()) {
+        closeModal(modal, input, errorMsg);
+        bukaHalamanUtama(pintu, utama, pesanType, pesanDua, btnMusik, audio, kartu);
+      } else {
+        errorMsg.textContent = "Kode salah, coba lagi 🥺";
+        errorMsg.classList.remove("hidden");
+        input.classList.add("shake");
+        input.addEventListener("animationend", function () {
+          input.classList.remove("shake");
+        }, { once: true });
+        input.value = "";
+        input.focus();
+      }
     }
 
-    // Transisi keluar pintu masuk
+    submitBtn.addEventListener("click", handle);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); handle(); }
+    });
+  }
+
+  /* ── MUSIK ────────────────────────────────────────────── */
+  function setupMusikBtn(btn, audio) {
+    if (!btn || !audio) return;
+    btn.addEventListener("click", function () {
+      if (audio.paused) {
+        audio.play().then(function () {
+          isPlaying = true; updateBtn(btn, true);
+        }).catch(function () { isPlaying = false; updateBtn(btn, false); });
+      } else {
+        audio.pause(); isPlaying = false; updateBtn(btn, false);
+      }
+    });
+  }
+
+  function updateBtn(btn, playing) {
+    const label = btn.querySelector(".musik-label");
+    if (label) label.textContent = playing ? "Pause Musik" : "Play Musik";
+    btn.classList.toggle("playing", playing);
+    btn.setAttribute("aria-label", playing ? "Pause musik" : "Play musik");
+  }
+
+  /* ── BUKA HALAMAN UTAMA ───────────────────────────────── */
+  function bukaHalamanUtama(pintu, utama, pesanType, pesanDua, btnMusik, audio, kartu) {
+    if (audio) {
+      audio.play()
+        .then(function () { isPlaying = true; btnMusik.classList.remove("hidden"); updateBtn(btnMusik, true); })
+        .catch(function () { btnMusik.classList.remove("hidden"); updateBtn(btnMusik, false); });
+    }
+
     pintu.classList.add("fade-out");
 
     setTimeout(function () {
-      pintu.style.display = "none";
+      if (entryBg) { entryBg.stop(); entryBg = null; }
 
-      // FIX: hapus kelas 'hidden' & set display flex
+      pintu.style.display = "none";
       utama.classList.remove("hidden");
       utama.removeAttribute("aria-hidden");
       utama.style.display = "flex";
 
-      // Paksa reflow agar animasi fade-in berjalan
       void utama.offsetWidth;
       utama.classList.add("fade-in");
 
-      spawnHearts(utama);
-      typewriterEffect(pesanType, pesanDua);
-    }, CONFIG.transisiDurasi);
+      mainBg = createSubtleCanvas("main-bg-canvas", "main");
+      spawnStars();
+      staggerIn(kartu);
+      setTimeout(function () { initTilt(kartu); }, 700);
+      typewriter(pesanType, pesanDua);
+
+    }, CONFIG.transisiMs);
   }
 
-  /* ─── TYPEWRITER ─────────────────────────────────────────────────── */
-  function typewriterEffect(pesanType, pesanDua) {
-    const chars = Array.from(CONFIG.pesanTypewriter);
-    let index   = 0;
-    pesanType.innerHTML = '<span class="tw-cursor" aria-hidden="true"></span>';
+  /* ── STAGGER ENTRANCE ─────────────────────────────────── */
+  function staggerIn(kartu) {
+    if (!kartu) return;
+    const children = Array.from(kartu.children);
+    children.forEach(function (child, i) {
+      child.style.opacity   = "0";
+      child.style.transform = "translateY(22px)";
+      child.style.transition = "none";
+      setTimeout(function () {
+        child.style.transition = "opacity 0.8s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1)";
+        child.style.opacity    = "";
+        child.style.transform  = "";
+      }, 150 + i * 130);
+    });
+  }
 
+  /* ── GENTLE 3D TILT ───────────────────────────────────── */
+  function initTilt(kartu) {
+    if (!kartu) return;
+    let tX = 0, tY = 0, cX = 0, cY = 0;
+
+    kartu.addEventListener("mousemove", function (e) {
+      const r = kartu.getBoundingClientRect();
+      tX = ((e.clientY - r.top)  / r.height - 0.5) * -6;
+      tY = ((e.clientX - r.left) / r.width  - 0.5) *  6;
+    });
+    kartu.addEventListener("mouseleave", function () { tX = 0; tY = 0; });
+
+    (function loop() {
+      cX += (tX - cX) * 0.07;
+      cY += (tY - cY) * 0.07;
+      kartu.style.transform =
+        `perspective(1000px) rotateX(${cX.toFixed(3)}deg) rotateY(${cY.toFixed(3)}deg)`;
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* ── TYPEWRITER ───────────────────────────────────────── */
+  function typewriter(pesanType, pesanDua) {
+    const chars = Array.from(CONFIG.pesanTypewriter);
+    let i = 0;
+    pesanType.innerHTML = '<span class="tw-cursor" aria-hidden="true"></span>';
     const cursor = pesanType.querySelector(".tw-cursor");
 
-    const interval = setInterval(function () {
-      if (index >= chars.length) {
-        clearInterval(interval);
-
-        // Hapus kursor setelah selesai
-        setTimeout(function () {
-          cursor.classList.add("tw-cursor--done");
-        }, 600);
-
-        // Tampilkan pesan kedua
+    const iv = setInterval(function () {
+      if (i >= chars.length) {
+        clearInterval(iv);
+        setTimeout(function () { cursor.classList.add("tw-cursor--done"); }, 400);
         setTimeout(function () {
           pesanDua.textContent = CONFIG.pesanKedua;
           pesanDua.removeAttribute("aria-hidden");
           pesanDua.classList.add("visible");
-        }, 1000);
-
+        }, 900);
         return;
       }
-
-      const char = chars[index];
-      cursor.insertAdjacentHTML(
-        "beforebegin",
-        char === "\n" ? "<br>" : escapeHTML(char)
-      );
-      index += 1;
-    }, CONFIG.typewriterDelay);
+      const ch = chars[i];
+      cursor.insertAdjacentHTML("beforebegin", ch === "\n" ? "<br>" : esc(ch));
+      i++;
+    }, CONFIG.typewriterMs);
   }
 
-  /* ─── SPAWN HEARTS ───────────────────────────────────────────────── */
-  function spawnHearts(container) {
-    const fragment = document.createDocumentFragment();
+  /* ── BINTANG MELAYANG ─────────────────────────────────── */
+  function spawnStars() {
+    const layer = document.getElementById("stars-layer");
+    if (!layer) return;
+    const frag  = document.createDocumentFragment();
+    const glyphs = ["✦","·","✧","⋆","✩","°"];
 
-    for (let i = 0; i < CONFIG.jumlahHati; i += 1) {
-      const heart = document.createElement("div");
-      heart.className  = "heart";
-      heart.textContent =
-        CONFIG.emojiHati[Math.floor(Math.random() * CONFIG.emojiHati.length)];
-      heart.setAttribute("aria-hidden", "true");
-      heart.style.cssText = [
-        `left: ${(Math.random() * 95).toFixed(1)}vw`,
-        `animation-duration: ${(6 + Math.random() * 8).toFixed(2)}s`,
-        `animation-delay: ${(Math.random() * 5).toFixed(2)}s`,
-        `font-size: ${(14 + Math.random() * 16).toFixed(0)}px`,
+    for (let i = 0; i < CONFIG.jumlahBintang; i++) {
+      const s   = document.createElement("div");
+      const dur = 8 + Math.random() * 14;
+      const del = Math.random() * 10;
+      const sz  = 8 + Math.random() * 12;
+
+      s.className = "star-particle";
+      s.setAttribute("aria-hidden","true");
+      s.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      s.style.cssText = [
+        `left:${(Math.random() * 98).toFixed(1)}vw`,
+        `font-size:${sz}px`,
+        `animation-duration:${dur.toFixed(2)}s`,
+        `animation-delay:-${del.toFixed(2)}s`,
+        `opacity:${(0.2 + Math.random() * 0.45).toFixed(2)}`,
       ].join(";");
 
-      fragment.appendChild(heart);
+      frag.appendChild(s);
     }
-
-    container.appendChild(fragment);
+    layer.appendChild(frag);
   }
 
-  /* ─── UTIL: HTML ESCAPE ──────────────────────────────────────────── */
-  function escapeHTML(str) {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  /* ── SUBTLE BACKGROUND CANVAS ─────────────────────────── */
+  function createSubtleCanvas(id, mode) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return null;
+    const ctx = canvas.getContext("2d");
+    let raf;
+
+    const colors = mode === "entry"
+      ? ["#3d1a2e","#1a1030","#0d1a2e"]
+      : ["#2e1220","#1a0d28","#0d1520"];
+
+    function resize() {
+      canvas.width  = canvas.offsetWidth  || window.innerWidth;
+      canvas.height = canvas.offsetHeight || window.innerHeight;
+    }
+    resize();
+    new ResizeObserver(resize).observe(canvas.parentElement || document.body);
+
+    const blobs = colors.map(function (c) {
+      return {
+        x: Math.random(), y: Math.random(),
+        vx: (Math.random() - 0.5) * 0.0006,
+        vy: (Math.random() - 0.5) * 0.0006,
+        r: 0.35 + Math.random() * 0.2,
+        color: c,
+      };
+    });
+
+    function draw() {
+      const W = canvas.width, H = canvas.height;
+      if (!W || !H) { raf = requestAnimationFrame(draw); return; }
+
+      ctx.clearRect(0,0,W,H);
+      ctx.globalCompositeOperation = "screen";
+
+      blobs.forEach(function (b) {
+        b.x += b.vx; b.y += b.vy;
+        if (b.x < 0 || b.x > 1) b.vx *= -1;
+        if (b.y < 0 || b.y > 1) b.vy *= -1;
+
+        const x = b.x * W, y = b.y * H, r = b.r * Math.min(W,H);
+        const g = ctx.createRadialGradient(x,y,0,x,y,r);
+        const [r2,g2,b2] = hexRgb(b.color);
+        g.addColorStop(0,   `rgba(${r2},${g2},${b2},0.55)`);
+        g.addColorStop(0.5, `rgba(${r2},${g2},${b2},0.15)`);
+        g.addColorStop(1,   `rgba(${r2},${g2},${b2},0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      });
+
+      raf = requestAnimationFrame(draw);
+    }
+    draw();
+    return { stop: function () { cancelAnimationFrame(raf); } };
   }
+
+  /* ── UTIL ─────────────────────────────────────────────── */
+  function hexRgb(hex) {
+    return [
+      parseInt(hex.slice(1,3),16),
+      parseInt(hex.slice(3,5),16),
+      parseInt(hex.slice(5,7),16),
+    ];
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
 })();

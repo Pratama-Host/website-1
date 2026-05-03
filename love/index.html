@@ -4,78 +4,82 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Easter Egg Spesial</title>
+    <title>Untukmu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- HALAMAN PINTU MASUK -->
+
+    <!-- ═══ PINTU MASUK ═══ -->
     <section id="pintu-masuk" aria-label="Halaman awal">
-      <div
-        id="trigger"
-        role="button"
-        tabindex="0"
-        aria-label="Tombol tersembunyi"
-      ></div>
+      <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-      <!-- MODAL KODE -->
-      <div
-        id="modal-kode"
-        class="hidden"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="kode-title"
-      >
+      <!-- Trigger tersembunyi -->
+      <div id="trigger" role="button" tabindex="0" aria-label="Tombol tersembunyi"></div>
+
+      <!-- Modal -->
+      <div id="modal-kode" class="hidden" role="dialog" aria-modal="true" aria-labelledby="kode-title">
         <div class="modal-panel">
-          <button
-            type="button"
-            id="modal-close"
-            class="modal-close"
-            aria-label="Tutup modal"
-          >&#x2715;</button>
+          <button type="button" id="modal-close" class="modal-close" aria-label="Tutup">&#x2715;</button>
 
-          <p id="kode-title" class="modal-title">🔑 Masukkan Kode</p>
+          <div class="modal-ornament" aria-hidden="true">✦</div>
+          <p id="kode-title" class="modal-title">Kode Rahasia</p>
 
           <div id="kode-form">
             <input
               id="kode-input"
               type="password"
-              placeholder="···"
+              placeholder="· · · · · ·"
               autocomplete="off"
               aria-label="Kode rahasia"
               aria-describedby="error-msg"
             />
-            <button type="button" id="kode-submit">Buka ✨</button>
+            <button type="button" id="kode-submit">Buka</button>
             <p id="error-msg" class="hidden" role="alert" aria-live="assertive"></p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- HALAMAN UTAMA -->
+    <!-- ═══ HALAMAN UTAMA ═══ -->
     <section id="halaman-utama" aria-label="Pesan spesial" aria-hidden="true">
+      <canvas id="main-bg-canvas" aria-hidden="true"></canvas>
+
       <div class="kartu">
-        <img
-          id="foto-utama"
-          src="foto.jpg"
-          alt="Foto spesial untukmu"
-          width="280"
-          height="320"
-          loading="lazy"
-          decoding="async"
-        />
-        <h1 id="nama-penerima">Untuk Kamu ✨</h1>
+        <div class="foto-wrap">
+          <img
+            id="foto-utama"
+            src="foto.jpg"
+            alt="Foto spesial untukmu"
+            width="260"
+            height="300"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <p class="kartu-keterangan">untuk kamu,</p>
+        <h1 id="nama-penerima">yang selalu ada di pikiranku</h1>
+
+        <div class="divider" aria-hidden="true"><span>✦</span></div>
+
         <p id="pesan-typewriter" aria-live="polite"></p>
         <p id="pesan-dua" aria-hidden="true"></p>
+
         <button id="btn-musik" class="hidden" aria-label="Play atau pause musik">
-          🎵 Play Musik
+          <span class="musik-icon" aria-hidden="true">♪</span>
+          <span class="musik-label">Play Musik</span>
         </button>
       </div>
+
+      <!-- Partikel bintang -->
+      <div id="stars-layer" aria-hidden="true"></div>
+
       <audio id="audio-bg" src="lucu.mp3" loop preload="auto"></audio>
     </section>
 

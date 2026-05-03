@@ -397,8 +397,8 @@ textarea {
   gap: 10px;
 }
 .brand-badge {
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-s);
   background: linear-gradient(135deg, var(--accent-700), var(--accent-500));
   color: #fff;
@@ -415,6 +415,89 @@ textarea {
     box-shadow 0.3s var(--ease-in-out),
     transform 0.3s var(--ease-spring);
   position: relative;
+}
+
+.brand-logo {
+  background: transparent;
+  box-shadow: none;
+  border-radius: var(--radius-s);
+  object-fit: contain;
+  padding: 2px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .brand-logo:hover {
+    transform: rotate(-3deg) scale(1.1);
+    filter: drop-shadow(0 4px 12px rgba(185, 28, 28, 0.3));
+  }
+}
+
+/* Logo Lightbox */
+.logo-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-in-out);
+  padding: 20px;
+}
+
+.logo-lightbox.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.logo-lightbox img {
+  max-width: min(90vw, 600px);
+  max-height: 82vh;
+  border-radius: var(--radius-m);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(var(--accent-rgb), 0.15);
+  object-fit: contain;
+  transform: scale(0.88);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.logo-lightbox.open img {
+  transform: scale(1);
+}
+
+.logo-lightbox-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.25s var(--ease-in-out);
+  backdrop-filter: blur(8px);
+  z-index: 3;
+}
+
+@media (hover: hover) {
+  .logo-lightbox-close:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: rotate(90deg) scale(1.05);
+  }
 }
 @media (hover: hover) {
   .top-bar-brand a:hover .brand-badge {
@@ -582,67 +665,23 @@ textarea {
   background: var(--surface);
   border-left: 1px solid var(--border-mid);
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
-  padding: 64px 0 0 0;
+  padding: 24px 0 20px 0;
   display: flex;
   flex-direction: column;
   gap: 0;
   transform: translateX(100%);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--trans) var(--ease-spring);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 #hamburger-menu[aria-hidden="false"] .hamburger-menu-panel {
   transform: translateX(0);
 }
+/* Close Button */
 #hamburger-menu .hamburger-menu-close {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--border-mid);
-  background: var(--surface-2);
-  color: var(--text-1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-#hamburger-menu .hamburger-menu-close:hover {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-a.hamburger-link {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 20px;
-  color: var(--text-1);
-  font-weight: 700;
-  font-size: 1.05rem;
-  border-radius: 8px;
-  margin: 0 14px 8px 14px;
-  transition:
-    background 0.18s,
-    color 0.18s;
-  position: relative;
-  border-left: 4px solid transparent;
-}
-a.hamburger-link.active {
-  background: var(--surface-2);
-  border-left: 4px solid var(--accent);
-  color: var(--accent);
-}
-a.hamburger-link:hover {
-  background: var(--surface-2);
-  color: var(--accent);
-}
-
-#hamburger-menu .hamburger-menu-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -654,6 +693,8 @@ a.hamburger-link:hover {
   justify-content: center;
   font-size: 1rem;
   transition: all var(--trans);
+  cursor: pointer;
+  z-index: 10;
 }
 
 #hamburger-menu .hamburger-menu-close:hover {
@@ -662,25 +703,30 @@ a.hamburger-link:hover {
   border-color: transparent;
 }
 
+/* Menu Links */
 a.hamburger-link {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
   color: var(--text-1);
+  font-weight: 700;
+  font-size: 1.05rem;
   transition: all var(--trans);
   position: relative;
   overflow: hidden;
-  margin: 0;
-  font-weight: 700;
-  width: 100%;
   border-radius: var(--radius-m);
   background: var(--surface-2);
   border: 1px solid var(--border);
+  width: calc(100% - 40px);
+  margin: 0 20px 12px 20px;
+  min-height: 44px;
+  text-decoration: none;
+  z-index: 1;
 }
 
-a.hamburger-link:not(:last-child) {
-  margin-bottom: 12px;
+a.hamburger-link:first-of-type {
+  margin-top: 52px;
 }
 
 a.hamburger-link::before {
@@ -690,6 +736,7 @@ a.hamburger-link::before {
   background: linear-gradient(90deg, var(--accent), transparent);
   opacity: 0;
   transition: opacity var(--trans);
+  z-index: -1;
 }
 
 a.hamburger-link i {
@@ -697,6 +744,20 @@ a.hamburger-link i {
   text-align: center;
   color: var(--accent);
   flex-shrink: 0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+a.hamburger-link span:last-child {
+  flex: 1;
+}
+
+a.hamburger-link.active {
+  border-left: 4px solid var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.08);
 }
 
 @media (hover: hover) {
@@ -709,6 +770,7 @@ a.hamburger-link i {
   }
 }
 
+/* Prevent scroll when menu is open */
 body.hamburger-open {
   overflow: hidden;
 }
@@ -3705,7 +3767,7 @@ body.hamburger-open {
   [data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: calc(100% + 7px);
+    top: calc(100% + 7px);
     left: 50%;
     transform: translateX(-50%);
     background: var(--surface-2);
@@ -3726,85 +3788,6 @@ body.hamburger-open {
   [data-tooltip]:hover::after {
     opacity: 1;
   }
-}
-
-/* ================================================================
-   GALLERY FILTER BUTTONS
-   ================================================================ */
-.gallery-filters {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-  animation: filterSlideIn 0.5s var(--ease-in-out);
-}
-
-@keyframes filterSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.filter-btn {
-  font-family: "Fira Code", monospace;
-  font-size: 0.7rem;
-  padding: 7px 16px;
-  border-radius: 22px;
-  border: 1px solid var(--border-mid);
-  background: transparent;
-  color: var(--text-3);
-  cursor: pointer;
-  transition: all 0.3s var(--ease-spring);
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  position: relative;
-  -webkit-tap-highlight-color: transparent;
-  font-weight: 500;
-}
-
-.filter-btn.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow:
-    0 6px 20px rgba(var(--accent-rgb), 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  animation: filterPulse 0.4s var(--ease-out);
-}
-
-@keyframes filterPulse {
-  0% {
-    transform: translateY(-2px) scale(1);
-  }
-  50% {
-    transform: translateY(-2px) scale(1.05);
-  }
-  100% {
-    transform: translateY(-2px) scale(1);
-  }
-}
-
-@media (hover: hover) {
-  .filter-btn:not(.active):hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: rgba(var(--accent-rgb), 0.08);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
-  }
-}
-
-.filter-btn:active {
-  transform: scale(0.95) translateY(0);
-  transition: transform 0.12s ease;
 }
 
 /* ================================================================

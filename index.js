@@ -19,6 +19,8 @@ function initNetworkCanvas() {
   let width = 0,
     height = 0;
   let particles = [];
+  let rafId = null;
+  let running = true;
   const PARTICLE_COUNT = Math.floor(
     (window.innerWidth * window.innerHeight) / 3800,
   );
@@ -106,29 +108,98 @@ function initNetworkCanvas() {
   }
 
   function animate() {
+    if (!running) return;
     update();
     draw();
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
   }
+
+  function destroy() {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    window.removeEventListener("resize", resizeHandler);
+    observer.disconnect();
+    ctx.clearRect(0, 0, width, height);
+    canvas.style.display = "none";
+  }
+
+  const resizeHandler = () => {
+    resize();
+    initParticles();
+  };
 
   resize();
   initParticles();
   animate();
-  window.addEventListener("resize", () => {
-    resize();
-    initParticles();
-  });
+  window.addEventListener("resize", resizeHandler);
   // Recolor on theme change
   const observer = new MutationObserver(draw);
   observer.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
   });
+
+  return { destroy };
+}
+
+const CANVAS_PREF_KEY = "tkj-canvas-enabled";
+const CANVAS_BREAKPOINT = 768;
+let networkCanvasController = null;
+
+function isCanvasEnabledByDefault() {
+  return window.innerWidth >= CANVAS_BREAKPOINT;
+}
+
+function getCanvasEnabled() {
+  const stored = localStorage.getItem(CANVAS_PREF_KEY);
+  if (stored === "1" || stored === "true") return true;
+  if (stored === "0" || stored === "false") return false;
+  return isCanvasEnabledByDefault();
+}
+
+function setCanvasEnabled(value) {
+  try {
+    localStorage.setItem(CANVAS_PREF_KEY, value ? "1" : "0");
+  } catch {}
+}
+
+function updateCanvasButtonState(btn, enabled) {
+  if (!btn) return;
+  btn.classList.toggle("active", enabled);
+  btn.setAttribute(
+    "aria-label",
+    enabled ? "Matikan animasi latar" : "Nyalakan animasi latar",
+  );
+  const icon = btn.querySelector("i");
+  if (icon) {
+    icon.className = enabled ? "fas fa-toggle-on" : "fas fa-toggle-off";
+  }
+}
+
+function renderNetworkCanvasState() {
+  const canvas = document.getElementById("network-canvas");
+  const enabled = getCanvasEnabled();
+  const btn = document.getElementById("canvas-btn");
+  updateCanvasButtonState(btn, enabled);
+  if (!canvas) return;
+
+  if (enabled) {
+    if (!networkCanvasController) {
+      canvas.style.display = "";
+      networkCanvasController = initNetworkCanvas();
+    }
+  } else {
+    if (networkCanvasController) {
+      networkCanvasController.destroy();
+      networkCanvasController = null;
+    }
+    canvas.style.display = "none";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("network-canvas")) {
-    initNetworkCanvas();
+    renderNetworkCanvasState();
   }
 });
 
@@ -816,6 +887,53 @@ function initReplayIntroBtn() {
 })();
 
 /* ================================================================
+   MODULE: LOGO ENLARGEMENT ON CLICK (LIGHTBOX PATTERN)
+   ================================================================ */
+(function initLogoLightbox() {
+  const logo = document.getElementById("brand-logo");
+  const lightbox = document.getElementById("logo-lightbox");
+  const lightboxClose = document.getElementById("logo-lightbox-close");
+
+  if (!logo || !lightbox || !lightboxClose) return;
+
+  function openLogoLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    lightboxClose?.focus();
+  }
+
+  function closeLogoLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove("open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  logo.addEventListener("click", openLogoLightbox);
+
+  logo.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openLogoLightbox();
+    }
+  });
+
+  lightboxClose.addEventListener("click", closeLogoLightbox);
+
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLogoLightbox();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && lightbox.classList.contains("open")) {
+      closeLogoLightbox();
+    }
+  });
+})();
+
+/* ================================================================
    MODULE: SERVICE WORKER — REGISTRATION + UPDATE TOAST
    ================================================================ */
 (function registerSW() {
@@ -899,6 +1017,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // global UI niceties
   createGlobalClock();
   initThemeToggleHeader();
+  initCanvasToggleHeader();
   initHamburger();
 });
 
@@ -1005,6 +1124,31 @@ function initThemeToggleHeader() {
       <i class="fas fa-moon" aria-hidden="true"></i>
     </span>
   `;
+
+  topBarActions.appendChild(btn);
+}
+
+function initCanvasToggleHeader() {
+  const topBarActions = document.querySelector(".top-bar-actions");
+  if (!topBarActions || document.getElementById("canvas-btn")) return;
+
+  const btn = document.createElement("button");
+  btn.id = "canvas-btn";
+  btn.className = "theme-toggle canvas-toggle";
+  btn.setAttribute("aria-label", "Toggle animasi latar");
+  btn.setAttribute("data-tooltip", "Toggle Animasi Latar");
+  btn.innerHTML = `
+    <span class="theme-icon-wrapper">
+      <i class="fas fa-toggle-${getCanvasEnabled() ? "on" : "off"}" aria-hidden="true"></i>
+    </span>
+  `;
+
+  btn.addEventListener("click", () => {
+    const enabled = !getCanvasEnabled();
+    setCanvasEnabled(enabled);
+    renderNetworkCanvasState();
+    updateCanvasButtonState(btn, enabled);
+  });
 
   topBarActions.appendChild(btn);
 }
@@ -1666,7 +1810,6 @@ function initSkillsPage() {
    ================================================================ */
 function initGalleryPage() {
   const grid = document.getElementById("gallery-grid");
-  const filterWrap = document.getElementById("gallery-filters");
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightbox-img");
   const lightboxClose = document.getElementById("lightbox-close");
@@ -1688,56 +1831,19 @@ function initGalleryPage() {
     )
     .join("");
 
-  /* Kumpulkan kategori unik */
-  const allLabel = "SEMUA";
-  const labels = [
-    allLabel,
-    ...new Set(galeri.map((g) => g.label || "LAINNYA")),
-  ];
-
-  if (filterWrap) {
-    filterWrap.innerHTML = labels
-      .map(
-        (lbl, i) => `
-      <button class="filter-btn ${i === 0 ? "active" : ""}" data-filter="${lbl}"
-              aria-pressed="${i === 0 ? "true" : "false"}">${lbl}</button>`,
-      )
-      .join("");
-
-    filterWrap.addEventListener("click", (e) => {
-      const btn = e.target.closest(".filter-btn");
-      if (!btn) return;
-      filterWrap.querySelectorAll(".filter-btn").forEach((b) => {
-        b.classList.remove("active");
-        b.setAttribute("aria-pressed", "false");
-      });
-      btn.classList.add("active");
-      btn.setAttribute("aria-pressed", "true");
-      // smooth transition: fade-out grid then render
-      grid.classList.add("fade-out");
-      setTimeout(() => {
-        renderGallery(btn.dataset.filter);
-        grid.classList.remove("fade-out");
-      }, 220);
-    });
-  }
-
   // lightbox navigation state
   let currentLightboxIndex = -1;
   let visibleIndices = [];
 
-  function renderGallery(activeFilter = allLabel) {
-    const filtered =
-      activeFilter === allLabel
-        ? galeri
-        : galeri.filter((g) => (g.label || "LAINNYA") === activeFilter);
+  function renderGallery() {
+    const filtered = galeri;
     grid.innerHTML = "";
     visibleIndices = [];
     if (!filtered.length) {
       const msg = document.createElement("p");
       msg.style.cssText =
         'grid-column:1/-1;text-align:center;color:var(--text-3);font-family:"Fira Code",monospace;font-size:var(--text-xs);padding:40px 0';
-      msg.textContent = "Tidak ada foto pada kategori ini.";
+      msg.textContent = "Tidak ada foto tersedia.";
       grid.appendChild(msg);
       return;
     }
@@ -1800,7 +1906,7 @@ function initGalleryPage() {
     maybeInitStack && maybeInitStack();
   }
 
-  renderGallery(allLabel);
+  renderGallery();
   // initialize stack carousel visuals & interactions only for wide screens and small galleries
   function maybeInitStack() {
     const items = grid.querySelectorAll(".gallery-item");
