@@ -141,12 +141,29 @@ const URLValidator = (function () {
   return {
     isSafe(url) {
       if (!url || typeof url !== "string") return false;
+      const trimmed = url.trim();
+
+      // Cegah javascript: dan data: URIs (XSS risk)
+      if (
+        trimmed.toLowerCase().startsWith("javascript:") ||
+        trimmed.toLowerCase().startsWith("data:")
+      ) {
+        return false;
+      }
+
+      // Izinkan relative paths (./..., ../, /path)
+      if (trimmed.startsWith(".") || trimmed.startsWith("/")) {
+        return true;
+      }
+
+      // Izinkan absolute URLs (http, https)
       try {
-        const parsed = new URL(url.trim());
-        // Izinkan http dan https, cegah javascript: URI
+        const parsed = new URL(trimmed);
         return ["http:", "https:"].includes(parsed.protocol);
       } catch {
-        return false;
+        // Bukan URL valid, tapi mungkin relative path tanpa leading ./
+        // Jika hanya berisi path tanpa scheme, izinkan
+        return !trimmed.includes("://");
       }
     },
     sanitize(url) {
@@ -517,10 +534,14 @@ function appendTerminalLog(msg, ok = true) {
 }
 
 function handleTerminalCommand(cmd) {
+  const isInPage = window.location.pathname.includes("/page/");
+  const pagePrefix = isInPage ? "./" : "./page/";
+  const rootPrefix = isInPage ? "../" : "./";
+
   if (cmd === "home") {
     appendTerminalLog("[ROOT@TKJ-XI9]: Redirecting to home...");
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = rootPrefix + "index.html";
     }, 350);
     return;
   }
@@ -548,7 +569,7 @@ function handleTerminalCommand(cmd) {
   if (cmd === "gallery") {
     appendTerminalLog("[ROOT@TKJ-XI9]: Accessing gallery... Success!");
     setTimeout(() => {
-      window.location.href = "gallery.html";
+      window.location.href = pagePrefix + "gallery.html";
     }, 250);
     return;
   }
@@ -765,8 +786,10 @@ function initReplayIntroBtn() {
   if (!btn) return;
   if (sessionStorage.getItem("tkj-intro-done")) btn.classList.add("visible");
   btn.addEventListener("click", () => {
+    const isInPage = window.location.pathname.includes("/page/");
+    const rootPrefix = isInPage ? "../" : "./";
     sessionStorage.removeItem("tkj-intro-done");
-    window.location.href = "index.html";
+    window.location.href = rootPrefix + "index.html";
   });
 }
 
@@ -994,7 +1017,8 @@ function initHamburger() {
   if (!topBarActions || document.getElementById("hamburger-btn")) return;
 
   const isInPage = window.location.pathname.includes("/page/");
-  const prefix = isInPage ? "../" : "./";
+  const pagePrefix = isInPage ? "./" : "./page/";
+  const rootPrefix = isInPage ? "../" : "./";
 
   const btn = document.createElement("button");
   btn.id = "hamburger-btn";
@@ -1012,42 +1036,42 @@ function initHamburger() {
   // Static menu items (no tab-bar dependency)
   const items = [
     {
-      href: prefix + "index.html",
+      href: rootPrefix + "index.html",
       text: "Home",
       icon: '<i class="fas fa-house"></i>',
     },
     {
-      href: prefix + "about.html",
+      href: pagePrefix + "about.html",
       text: "Tentang",
       icon: '<i class="fas fa-circle-info"></i>',
     },
     {
-      href: prefix + "structure.html",
+      href: pagePrefix + "structure.html",
       text: "Struktur",
       icon: '<i class="fas fa-sitemap"></i>',
     },
     {
-      href: prefix + "members.html",
+      href: pagePrefix + "members.html",
       text: "Anggota",
       icon: '<i class="fas fa-users"></i>',
     },
     {
-      href: prefix + "skills.html",
+      href: pagePrefix + "skills.html",
       text: "Skills",
       icon: '<i class="fas fa-code"></i>',
     },
     {
-      href: prefix + "gallery.html",
+      href: pagePrefix + "gallery.html",
       text: "Galeri",
       icon: '<i class="fas fa-images"></i>',
     },
     {
-      href: prefix + "statistics.html",
+      href: pagePrefix + "statistics.html",
       text: "Statistik",
       icon: '<i class="fas fa-chart-bar"></i>',
     },
     {
-      href: prefix + "tkj.html",
+      href: pagePrefix + "tkj.html",
       text: "TKJ",
       icon: '<i class="fas fa-network-wired"></i>',
     },
@@ -1742,8 +1766,6 @@ function initGalleryPage() {
         img.alt = caption;
         img.loading = "lazy";
         img.decoding = "async";
-        img.width = 400;
-        img.height = 400;
         img.style.opacity = "0";
         img.addEventListener("load", () => {
           // prefer decode when available

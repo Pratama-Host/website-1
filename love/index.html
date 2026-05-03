@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Easter Egg Spesial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- HALAMAN PINTU MASUK -->
+    <section id="pintu-masuk" aria-label="Halaman awal">
+      <div
+        id="trigger"
+        role="button"
+        tabindex="0"
+        aria-label="Tombol tersembunyi"
+      ></div>
+
+      <!-- MODAL KODE -->
+      <div
+        id="modal-kode"
+        class="hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="kode-title"
+      >
+        <div class="modal-panel">
+          <button
+            type="button"
+            id="modal-close"
+            class="modal-close"
+            aria-label="Tutup modal"
+          >&#x2715;</button>
+
+          <p id="kode-title" class="modal-title">🔑 Masukkan Kode</p>
+
+          <div id="kode-form">
+            <input
+              id="kode-input"
+              type="password"
+              placeholder="···"
+              autocomplete="off"
+              aria-label="Kode rahasia"
+              aria-describedby="error-msg"
+            />
+            <button type="button" id="kode-submit">Buka ✨</button>
+            <p id="error-msg" class="hidden" role="alert" aria-live="assertive"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HALAMAN UTAMA -->
+    <section id="halaman-utama" aria-label="Pesan spesial" aria-hidden="true">
+      <div class="kartu">
+        <img
+          id="foto-utama"
+          src="foto.jpg"
+          alt="Foto spesial untukmu"
+          width="280"
+          height="320"
+          loading="lazy"
+          decoding="async"
+        />
+        <h1 id="nama-penerima">Untuk Kamu ✨</h1>
+        <p id="pesan-typewriter" aria-live="polite"></p>
+        <p id="pesan-dua" aria-hidden="true"></p>
+        <button id="btn-musik" class="hidden" aria-label="Play atau pause musik">
+          🎵 Play Musik
+        </button>
+      </div>
+      <audio id="audio-bg" src="lucu.mp3" loop preload="auto"></audio>
+    </section>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
